@@ -22,21 +22,23 @@ export default function BookTrips({ cartItems }) {
   const [bookTrips, { data, loading, error }] = useMutation(
     BOOK_TRIPS,
     {
-      refetchQueries: cartItems.map(launchId => ({
-        query: GET_LAUNCH,
-        variables: { launchId },
-      })),
-
+      variables: { launchIds: cartItems },
+      refetchQueries: cartItems.map(launchId => {
+        return {
+          query: GET_LAUNCH,
+          variables: { launchId },
+        };
+      }),
       update(cache) {
         cache.writeData({ data: { cartItems: [] } });
       }
-    }
-  )
-  return data && data.bookTrips && !data.bookTrips.success
-    ? <p data-testid="message">{data.bookTrips.message}</p>
-    : (
-      <Button onClick={bookTrips} data-testid="book-button">
-        Book All
-      </Button>
-    );
+    },
+  );
+  return data && data.bookTrips && !data.bookTrips.success ? (
+    <p data-testid="message">{data.bookTrips.message}</p>
+  ) : (
+    <Button onClick={bookTrips} data-testid="book-button">
+      Book All
+    </Button>
+  );
 }
